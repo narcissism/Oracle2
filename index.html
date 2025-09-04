@@ -1,8 +1,55 @@
-<script>
-  // replace fetch URL inside sendMessage with:
-const response = await fetch("/api/chat", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ message: userText })
-});
-</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Oracle 🔮</title>
+  <style>
+    body { font-family: serif; background: #111; color: #eee; display: flex; justify-content: center; align-items: center; height: 100vh; }
+    #chat { width: 400px; max-height: 600px; border: 2px solid purple; border-radius: 12px; padding: 10px; overflow-y: auto; background: #222; }
+    .msg { margin: 8px 0; }
+    .user { color: #6cf; }
+    .bot { color: #fc6; }
+    #inputBox { display: flex; margin-top: 10px; }
+    input { flex: 1; padding: 8px; border-radius: 8px; border: none; }
+    button { margin-left: 5px; padding: 8px; border-radius: 8px; background: purple; color: white; border: none; }
+  </style>
+</head>
+<body>
+  <div>
+    <div id="chat"></div>
+    <div id="inputBox">
+      <input id="userInput" placeholder="Ask the oracle..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <script>
+  const chatDiv = document.getElementById("chat");
+  const input = document.getElementById("userInput");
+
+  async function sendMessage() {
+    const userText = input.value.trim();
+    if (!userText) return;
+    appendMessage("You", userText, "user");
+    input.value = "";
+
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: userText })
+    });
+
+    const data = await response.json();
+    appendMessage("Oracle", data.reply, "bot");
+  }
+
+  function appendMessage(sender, text, cls) {
+    const div = document.createElement("div");
+    div.className = "msg " + cls;
+    div.innerHTML = `<b>${sender}:</b> ${text}`;
+    chatDiv.appendChild(div);
+    chatDiv.scrollTop = chatDiv.scrollHeight;
+  }
+  </script>
+</body>
+</html>
