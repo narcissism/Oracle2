@@ -3,23 +3,38 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { message } = req.body;
+  try {
+    const { message } = req.body;
 
-  const r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: "openai/gpt-4o-mini",
-      messages: [
-        { role: "system", content: "You are Manifestation Oracle, inspired by Neville Goddard. Speak in brief, poetic messages about imagination, belief, and creating reality. Reference: - Barbados as a state of ease and fulfillment - SATS (state akin to sleep) as a time for creative imagination - Living in the end: assuming and feeling the wish fulfilled Keep responses under 14 words. Be cryptic, uplifting, and encouraging." },
-        { role: "user", content: message }
-      ]
-    })
-  });
+    const r = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, // make sure your key is correct
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini", // check your model name
+        messages: [
+          { role: "system", content: "You are Oracle, a mystical psychic. Speak in short, cryptic, poetic messages." },
+          { role: "user", content: message },
+        ],
+      }),
+    });
 
-  const data = await r.json();
-  res.status(200).json({ reply: data.choices[0].message.content });
+    const data = await r.json();
+
+    // Log the full response for debugging
+    console.log("OpenAI response:", data);
+
+    // Check if data.choices exists
+    if (!data.choices || data.choices.length === 0) {
+      return res.status(500).json({ error: "No response from AI", raw: data });
+    }
+
+    const reply = data.choices[0].message.content;
+    res.status(200).json({ reply });
+  } catch (err) {
+    console.error("Server error:", err);
+    res.status(500).json({ error: "Something went wrong" });
+  }
 }
