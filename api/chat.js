@@ -49,4 +49,29 @@ Every message should feel like a mystical aphorism.
     console.error("Server error:", err);
     res.status(500).json({ reply: "⚠️ Server error: " + err.message });
   }
+
+  /**
+ * Randomly splits text into 1 or 2 lines with uneven breaks for a mystical feel.
+ */
+function mysticalLineBreak(text) {
+  if (Math.random() < 0.5 || text.split(" ").length < 4) {
+    // Keep as 1 line
+    return text;
+  } else {
+    const words = text.split(" ");
+    // Pick a random split point between 30% and 70% of words
+    const min = Math.floor(words.length * 0.3);
+    const max = Math.ceil(words.length * 0.7);
+    const splitIndex = Math.floor(Math.random() * (max - min + 1)) + min;
+
+    return words.slice(0, splitIndex).join(" ") + "\n" + words.slice(splitIndex).join(" ");
+  }
+}
+
+// Example usage:
+const original = "Assume it done. Rest in the end.";
+const oracleReply = mysticalLineBreak(original);
+console.log(oracleReply);
+
+  
 }
