@@ -33,14 +33,18 @@
     appendMessage("You", userText, "user");
     input.value = "";
 
-    const response = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: userText })
-    });
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userText })
+      });
 
-    const data = await response.json();
-    appendMessage("Oracle", data.reply, "bot");
+      const data = await response.json();
+      appendMessage("Oracle", data.reply, "bot");
+    } catch (err) {
+      appendMessage("Oracle", "⚠️ Error: " + err.message, "bot");
+    }
   }
 
   function appendMessage(sender, text, cls) {
@@ -50,7 +54,8 @@
     chatDiv.appendChild(div);
     chatDiv.scrollTop = chatDiv.scrollHeight;
   }
-     // --- NEW: Send message on Enter key ---
+
+  // --- NEW: Send message on Enter key ---
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault(); // prevent newline in input
