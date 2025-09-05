@@ -13,7 +13,7 @@ export default async function handler(req, res) {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "gpt-4o-mini", // <-- make sure this is a real model on your account
         messages: [
           { role: "system", content: "You are Oracle, a mystical psychic. Speak in short, cryptic, poetic messages." },
           { role: "user", content: message },
@@ -23,22 +23,20 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
+    // Log everything to Vercel logs
     console.log("DEBUG status:", response.status);
-    console.log("DEBUG response:", data);
+    console.log("DEBUG headers:", Object.fromEntries(response.headers.entries()));
+    console.log("DEBUG body:", data);
 
-    // If there’s an error from OpenAI, return it to the frontend
-    if (data.error) {
-      return res.status(500).json({ reply: `⚠️ ${data.error.message}` });
+    // Show raw JSON back in browser for debugging
+    if (!data.choices || data.choices.length === 0) {
+      return res.status(500).json({ reply: "⚠️ RAW RESPONSE: " + JSON.stringify(data) });
     }
 
-    const reply =
-      data?.choices?.[0]?.message?.content ||
-      data?.choices?.[0]?.text ||
-      "Oracle is silent...";
-
+    const reply = data.choices[0].message?.content || data.choices[0].text || "Oracle is silent...";
     res.status(200).json({ reply });
   } catch (err) {
     console.error("Server error:", err);
-    res.status(500).json({ reply: "Something went wrong." });
+    res.status(500).json({ reply: "⚠️ Server error: " + err.message });
   }
 }
