@@ -50,6 +50,13 @@
     chatDiv.appendChild(div);
     chatDiv.scrollTop = chatDiv.scrollHeight;
   }
+     // --- NEW: Send message on Enter key ---
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault(); // prevent newline in input
+      sendMessage();
+    }
+  });
   </script>
 </body>
 </html>
