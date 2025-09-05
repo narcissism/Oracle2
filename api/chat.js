@@ -21,7 +21,7 @@ export default async function handler(req, res) {
       }),
     });
 
-    const data = await response.json();
+    const data = await response.json(); 
 
     // Log everything to Vercel logs
     console.log("DEBUG status:", response.status);
